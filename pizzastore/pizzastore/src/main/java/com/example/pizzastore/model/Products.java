@@ -18,10 +18,10 @@ public class Products {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Enumerated(EnumType.STRING)
+    @Transient
     private PizzaSize size;
 
-    @Enumerated(EnumType.STRING)
+    @Transient
     private CrustType crustType;
 
     private String description;
@@ -79,21 +79,21 @@ public class Products {
         this.category = category;
     }
 
-    public PizzaSize getSize() {
-        return size;
-    }
+//    public PizzaSize getSize() {
+//        return size;
+//    }
+//
+//    public void setSize(PizzaSize size) {
+//        this.size = size;
+//    }
 
-    public void setSize(PizzaSize size) {
-        this.size = size;
-    }
-
-    public CrustType getCrustType() {
-        return crustType;
-    }
-
-    public void setCrustType(CrustType crustType) {
-        this.crustType = crustType;
-    }
+//    public CrustType getCrustType() {
+//        return crustType;
+//    }
+//
+//    public void setCrustType(CrustType crustType) {
+//        this.crustType = crustType;
+//    }
 
     public String getDescription() {
         return description;
