@@ -5,71 +5,65 @@ import com.example.pizzastore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
-
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id){
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
+    // Register only with username and password
     public String registerUser(String username, String password) {
-        if (userRepository.findByUsername(username).isPresent()) {
+        if (userRepository.findByUserName(username).isPresent()) {
             return "User already exists";
         }
 
         User user = new User();
-        user.setUsername(username);
+        user.setUserName(username);
         user.setPassword(password);
 
         userRepository.save(user);
-
         return "User registered successfully";
     }
+
+    // Update other fields of the user
     public Optional<User> updateUser(Long id, User updatedUser) {
         Optional<User> existingUserOpt = userRepository.findById(id);
 
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
 
-
-            if (updatedUser.getUsername() != null && !updatedUser.getUsername().isEmpty()) {
-                existingUser.setUsername(updatedUser.getUsername());
+            // Update fields if present and not empty
+            if (updatedUser.getUserName() != null && !updatedUser.getUserName().isEmpty()) {
+                existingUser.setUserName(updatedUser.getUserName());
             }
             if (updatedUser.getEmail() != null && !updatedUser.getEmail().isEmpty()) {
                 existingUser.setEmail(updatedUser.getEmail());
             }
-            if (updatedUser.getPhno() != null && !updatedUser.getPhno().isEmpty()) {
-                existingUser.setPhno(updatedUser.getPhno());
+            if (updatedUser.getPhoneNumber() != null && !updatedUser.getPhoneNumber().isEmpty()) {
+                existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
             }
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
                 existingUser.setPassword(updatedUser.getPassword());
             }
 
-
             return Optional.of(userRepository.save(existingUser));
         } else {
-
             return Optional.empty();
         }
     }
 
-
-
-
-
-
-    public void deleteUser(Long id){
+    public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
-
 }

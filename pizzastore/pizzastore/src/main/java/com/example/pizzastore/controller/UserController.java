@@ -1,6 +1,5 @@
 package com.example.pizzastore.controller;
 
-
 import com.example.pizzastore.model.User;
 import com.example.pizzastore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<User> getAllUser() {
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -28,11 +27,13 @@ public class UserController {
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Register a user with only username and password
     @PostMapping("/register")
-    public String registerUser(@RequestParam String username, @RequestParam String password) {
-        return userService.registerUser(username, password);
+    public String registerUser(@RequestBody User user) {
+        return userService.registerUser(user.getUserName(), user.getPassword());
     }
 
+    // Update other fields of the user
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         Optional<User> updatedUser = userService.updateUser(id, user);
@@ -42,8 +43,6 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-
         return ResponseEntity.noContent().build();
-
     }
 }

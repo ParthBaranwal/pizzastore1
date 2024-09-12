@@ -7,20 +7,20 @@ import jakarta.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
-    private String username;
+    private String userName;
     private String email;
-    private String phno;
+    private String phoneNumber;
     private String password;
 
 
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getPassword() {
@@ -31,12 +31,12 @@ public class User {
         this.password = password;
     }
 
-    public String getPhno() {
-        return phno;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhno(String phno) {
-        this.phno = phno;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -47,11 +47,11 @@ public class User {
         this.email = email;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
