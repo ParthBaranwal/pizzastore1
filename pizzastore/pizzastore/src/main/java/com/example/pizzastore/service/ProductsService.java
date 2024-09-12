@@ -1,11 +1,12 @@
 package com.example.pizzastore.service;
 
-import com.example.pizzastore.model.Category;
-import com.example.pizzastore.model.Products;
+import com.example.pizzastore.dto.ProductResponseDTO;
+import com.example.pizzastore.model.*;
 import com.example.pizzastore.repository.ProductsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,5 +45,33 @@ public class ProductsService {
     // Method to retrieve products by category
     public List<Products> getProductsByCategory(Category category) {
         return productsRepository.findByCategory(category);
+    }
+
+    public ProductResponseDTO getProductDetailsById(Long id) {
+        Products product = productsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
+
+        if (product.getCategory() == Category.PIZZA) {
+            // Create response DTO for pizza
+            return new ProductResponseDTO(
+                    product.getId(),
+                    product.getName(),
+                    product.getPrice(),
+                    product.getDescription(),
+                    Arrays.asList(PizzaSize.values()), // Available pizza sizes
+                    Arrays.asList(CrustType.values())  // Available crust types
+            );
+        } else if (product.getCategory() == Category.BEVERAGE) {
+            // Create response DTO for beverage
+            return new ProductResponseDTO(
+                    product.getId(),
+                    product.getName(),
+                    product.getPrice(),
+                    product.getDescription(),
+                    Arrays.asList(BeverageSize.values())  // Available beverage sizes
+            );
+        } else {
+            throw new RuntimeException("Product is not a pizza or beverage");
+        }
     }
 }
