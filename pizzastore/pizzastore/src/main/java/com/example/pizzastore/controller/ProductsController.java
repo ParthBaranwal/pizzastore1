@@ -1,5 +1,6 @@
 package com.example.pizzastore.controller;
 
+import com.example.pizzastore.dto.ProductResponseDTO;
 import com.example.pizzastore.model.Category;
 import com.example.pizzastore.model.Products;
 import com.example.pizzastore.service.ProductsService;
@@ -22,11 +23,26 @@ public class ProductsController {
         return productsService.getAllProducts();
     }
 
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Products> getProductById(@PathVariable Long id) {
+//        return productsService.getProductById(id)
+//                .map(ResponseEntity::ok)
+//                .orElse(ResponseEntity.notFound().build());
+//    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Products> getProductById(@PathVariable Long id) {
-        return productsService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+        Products product = productsService.getProductById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
+
+        if (product.getCategory() == Category.PIZZA || product.getCategory() == Category.BEVERAGE) {
+            // Call the service method to get product details
+            ProductResponseDTO productResponse = productsService.getProductDetailsById(id);
+            return ResponseEntity.ok(productResponse);
+        } else {
+            // Return the product directly for other categories
+            return ResponseEntity.ok(product);
+        }
     }
 
     @PostMapping
