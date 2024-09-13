@@ -1,3 +1,4 @@
+
 package com.example.pizzastore.service;
 
 import com.example.pizzastore.model.User;
@@ -36,14 +37,13 @@ public class UserService {
         return "User registered successfully";
     }
 
-    // Update other fields of the user
     public Optional<User> updateUser(Long id, User updatedUser) {
         Optional<User> existingUserOpt = userRepository.findById(id);
 
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
 
-            // Update fields if present and not empty
+            // Only update fields if they are provided and valid
             if (updatedUser.getUserName() != null && !updatedUser.getUserName().isEmpty()) {
                 existingUser.setUserName(updatedUser.getUserName());
             }
@@ -61,6 +61,7 @@ public class UserService {
         } else {
             return Optional.empty();
         }
+
     }
 
     public void deleteUser(Long id) {

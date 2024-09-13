@@ -4,13 +4,16 @@ import com.example.pizzastore.model.User;
 import com.example.pizzastore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
+@Validated
 public class UserController {
 
     @Autowired
@@ -27,15 +30,13 @@ public class UserController {
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Register a user with only username and password
     @PostMapping("/register")
-    public String registerUser(@RequestBody User user) {
+    public String registerUser(@Valid @RequestBody User user) {
         return userService.registerUser(user.getUserName(), user.getPassword());
     }
 
-    // Update other fields of the user
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         Optional<User> updatedUser = userService.updateUser(id, user);
         return updatedUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
