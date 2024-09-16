@@ -23,7 +23,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    // Register only with username and password
+
     public String registerUser(String username, String password) {
         if (userRepository.findByUserName(username).isPresent()) {
             return "User already exists";

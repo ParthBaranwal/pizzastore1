@@ -36,11 +36,11 @@ public class ProductsController {
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
 
         if (product.getCategory() == Category.PIZZA || product.getCategory() == Category.BEVERAGE) {
-            // Call the service method to get product details
+
             ProductResponseDTO productResponse = productsService.getProductDetailsById(id);
             return ResponseEntity.ok(productResponse);
         } else {
-            // Return the product directly for other categories
+
             return ResponseEntity.ok(product);
         }
     }
