@@ -6,8 +6,10 @@ import com.example.pizzastore.dto.ProductDTO;
 import com.example.pizzastore.model.Cart;
 import com.example.pizzastore.model.CartItem;
 import com.example.pizzastore.model.Products;
+import com.example.pizzastore.model.User;
 import com.example.pizzastore.repository.CartRepository;
 import com.example.pizzastore.repository.ProductsRepository;
+import com.example.pizzastore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +27,13 @@ public class CartService {
     @Autowired
     private ProductsRepository productsRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
     public CartDTO getCartById(Long cartId) {
         Optional<Cart> cartOpt = cartRepository.findById(cartId);
         if (!cartOpt.isPresent()) {
-            // Handle cart not found
+            throw new IllegalArgumentException("Cart not found");
         }
 
         Cart cart = cartOpt.get();
@@ -62,23 +66,34 @@ public class CartService {
 
         return cartDTO;
     }
+    public Cart createCartForUser(Long userId) {
+
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (!userOpt.isPresent()) {
+            throw new IllegalArgumentException("User not found with ID: " + userId);
+        }
+
+        User user = userOpt.get();
+
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+
+
+        return cartRepository.save(cart);
+    }
 
     public Cart addToCart(Long cartId, Long productId, int quantity) {
         Optional<Cart> cartOpt = cartRepository.findById(cartId);
-        Cart cart = cartOpt.orElseGet(() -> {
-            Cart newCart = new Cart();
-            newCart.setCartItems(new ArrayList<>());
-            return newCart;
-        });
+        if (!cartOpt.isPresent()) {
+            throw new IllegalArgumentException("Cart not found");
+        }
 
+        Cart cart = cartOpt.get();
         Optional<Products> productOpt = productsRepository.findById(productId);
         if (productOpt.isPresent()) {
             Products product = productOpt.get();
             boolean productExists = false;
-
-            if (cart.getCartItems() == null) {
-                cart.setCartItems(new ArrayList<>());
-            }
 
             for (CartItem item : cart.getCartItems()) {
                 if (item.getProduct().getId().equals(productId)) {
@@ -103,21 +118,45 @@ public class CartService {
     }
 
     public Cart updateCart(Long cartId, Long productId, int quantity) {
-        return addToCart(cartId, productId, quantity);
+        Optional<Cart> cartOpt = cartRepository.findById(cartId);
+        if (!cartOpt.isPresent()) {
+            throw new IllegalArgumentException("Cart not found");
+        }
+
+        Cart cart = cartOpt.get();
+        Optional<CartItem> itemOpt = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst();
+
+        if (itemOpt.isPresent()) {
+            CartItem item = itemOpt.get();
+            item.setQuantity(quantity);
+            item.setTotalPrice(item.getProduct().getPrice().multiply(BigDecimal.valueOf(quantity)));
+        } else {
+            throw new IllegalArgumentException("Item not found in the cart");
+        }
+
+        // Recalculate the total amount
+        cart.setTotalAmount(cart.getCartItems().stream()
+                .map(CartItem::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        return cartRepository.save(cart);
     }
 
     public Cart removeFromCart(Long cartId, Long productId) {
         Optional<Cart> cartOpt = cartRepository.findById(cartId);
         if (cartOpt.isPresent()) {
             Cart cart = cartOpt.get();
-            cart.getCartItems().removeIf(item -> item.getProduct().getId().equals(productId) && item.getQuantity() <= 1);
+            cart.getCartItems().removeIf(item -> item.getProduct().getId().equals(productId));
 
             cart.setCartItems(cart.getCartItems()); // Update totalAmount
             return cartRepository.save(cart);
         }
 
-        return null;
+        throw new IllegalArgumentException("Cart not found");
     }
+
     public Cart clearCart(Long cartId) {
         Optional<Cart> cartOpt = cartRepository.findById(cartId);
         if (cartOpt.isPresent()) {
@@ -126,6 +165,6 @@ public class CartService {
             cart.setTotalAmount(BigDecimal.ZERO); // Reset total amount to zero
             return cartRepository.save(cart);
         }
-        return null;
+        throw new IllegalArgumentException("Cart not found");
     }
 }

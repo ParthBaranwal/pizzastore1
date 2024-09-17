@@ -1,6 +1,5 @@
 package com.example.pizzastore.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,10 +13,14 @@ public class Cart {
     private Long id;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<CartItem> cartItems;
 
     private BigDecimal totalAmount = BigDecimal.ZERO;
+
+    // Unidirectional One-to-One relationship with User
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false, unique = true)
+    private User user;
 
     public Cart() {}
 
@@ -48,5 +51,13 @@ public class Cart {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
