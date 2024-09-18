@@ -29,8 +29,8 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Cart> addToCart(@RequestBody CartItemRequest cartItemRequest) {
-        Cart cart = cartService.addToCart(
+    public ResponseEntity<CartDTO> addToCart(@RequestBody CartItemRequest cartItemRequest) {
+        CartDTO cartDTO = cartService.addToCart(
                 cartItemRequest.getCartId(),
                 cartItemRequest.getProductId(),
                 cartItemRequest.getQuantity(),
@@ -38,8 +38,9 @@ public class CartController {
                 cartItemRequest.getCrustType(),
                 cartItemRequest.getBeverageSize()
         );
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(cartDTO);
     }
+
 
     @PutMapping("/update")
     public ResponseEntity<Cart> updateCart(@RequestBody CartItemRequest cartItemRequest) {

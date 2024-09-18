@@ -56,6 +56,15 @@ public class CartService {
             productDTO.setDescription(product.getDescription());
 
             cartItemDTO.setProduct(productDTO);
+
+            // Conditionally set pizza and beverage related fields
+            if (product.getCategory() == Category.PIZZA) {
+                cartItemDTO.setPizzaSize(cartItem.getPizzaSize());
+                cartItemDTO.setCrustType(cartItem.getCrustType());
+            } else if (product.getCategory() == Category.BEVERAGE) {
+                cartItemDTO.setBeverageSize(cartItem.getBeverageSize());
+            }
+
             cartItemDTOs.add(cartItemDTO);
         }
 
@@ -78,7 +87,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public Cart addToCart(Long cartId, Long productId, int quantity, PizzaSize pizzaSize, CrustType crustType, BeverageSize beverageSize) {
+    public CartDTO addToCart(Long cartId, Long productId, int quantity, PizzaSize pizzaSize, CrustType crustType, BeverageSize beverageSize) {
         Optional<Cart> cartOpt = cartRepository.findById(cartId);
         if (!cartOpt.isPresent()) {
             throw new IllegalArgumentException("Cart not found");
@@ -121,11 +130,51 @@ public class CartService {
                 cart.getCartItems().add(newItem);
             }
 
-            cart.setCartItems(cart.getCartItems()); // Update totalAmount
+            // Update totalAmount
+            cart.setTotalAmount(cart.getCartItems().stream()
+                    .map(CartItem::getTotalPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+
             cartRepository.save(cart);
         }
 
-        return cart;
+        // Convert Cart to CartDTO for the response
+        CartDTO cartDTO = new CartDTO();
+        cartDTO.setId(cart.getId());
+        cartDTO.setTotalAmount(cart.getTotalAmount());
+
+        List<CartItemDTO> cartItemDTOs = new ArrayList<>();
+        for (CartItem cartItem : cart.getCartItems()) {
+            CartItemDTO cartItemDTO = new CartItemDTO();
+            cartItemDTO.setId(cartItem.getId());
+            cartItemDTO.setQuantity(cartItem.getQuantity());
+            cartItemDTO.setTotalPrice(cartItem.getTotalPrice());
+
+            // Set product details
+            ProductDTO productDTO = new ProductDTO();
+            Products product = cartItem.getProduct();
+            productDTO.setId(product.getId());
+            productDTO.setName(product.getName());
+            productDTO.setPrice(product.getPrice());
+            productDTO.setCategory(product.getCategory().toString());
+            productDTO.setDescription(product.getDescription());
+
+            cartItemDTO.setProduct(productDTO);
+
+            // Conditionally set pizza and beverage related fields
+            if (product.getCategory() == Category.PIZZA) {
+                cartItemDTO.setPizzaSize(cartItem.getPizzaSize());
+                cartItemDTO.setCrustType(cartItem.getCrustType());
+            } else if (product.getCategory() == Category.BEVERAGE) {
+                cartItemDTO.setBeverageSize(cartItem.getBeverageSize());
+            }
+
+            cartItemDTOs.add(cartItemDTO);
+        }
+
+        cartDTO.setCartItems(cartItemDTOs);
+
+        return cartDTO;
     }
 
     public Cart updateCart(Long cartId, Long productId, int quantity) {
