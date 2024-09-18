@@ -4,7 +4,9 @@ import com.example.pizzastore.dto.CartDTO;
 import com.example.pizzastore.dto.CreateCartRequest;
 import com.example.pizzastore.model.Cart;
 import com.example.pizzastore.model.CartItemRequest;
+import com.example.pizzastore.model.Orders;
 import com.example.pizzastore.service.CartService;
+import com.example.pizzastore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,9 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
 
     @PostMapping("/create")
     public ResponseEntity<Cart> createCartForUser(@RequestBody CreateCartRequest createCartRequest) {
@@ -58,5 +63,12 @@ public class CartController {
     public ResponseEntity<Cart> clearCart(@RequestParam Long cartId) {
         Cart cart = cartService.clearCart(cartId);
         return ResponseEntity.ok(cart);
+
+
+    }
+    @PostMapping("/checkout/{cartId}")
+    public ResponseEntity<Orders> checkout(@PathVariable Long cartId) {
+        Orders order = orderService.checkout(cartId);
+        return ResponseEntity.ok(order);
     }
 }
