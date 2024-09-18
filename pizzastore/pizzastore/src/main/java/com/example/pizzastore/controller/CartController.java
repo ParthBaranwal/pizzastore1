@@ -30,7 +30,14 @@ public class CartController {
 
     @PostMapping("/add")
     public ResponseEntity<Cart> addToCart(@RequestBody CartItemRequest cartItemRequest) {
-        Cart cart = cartService.addToCart(cartItemRequest.getCartId(), cartItemRequest.getProductId(), cartItemRequest.getQuantity());
+        Cart cart = cartService.addToCart(
+                cartItemRequest.getCartId(),
+                cartItemRequest.getProductId(),
+                cartItemRequest.getQuantity(),
+                cartItemRequest.getPizzaSize(),
+                cartItemRequest.getCrustType(),
+                cartItemRequest.getBeverageSize()
+        );
         return ResponseEntity.ok(cart);
     }
 

@@ -3,10 +3,7 @@ package com.example.pizzastore.service;
 import com.example.pizzastore.dto.CartDTO;
 import com.example.pizzastore.dto.CartItemDTO;
 import com.example.pizzastore.dto.ProductDTO;
-import com.example.pizzastore.model.Cart;
-import com.example.pizzastore.model.CartItem;
-import com.example.pizzastore.model.Products;
-import com.example.pizzastore.model.User;
+import com.example.pizzastore.model.*;
 import com.example.pizzastore.repository.CartRepository;
 import com.example.pizzastore.repository.ProductsRepository;
 import com.example.pizzastore.repository.UserRepository;
@@ -83,7 +80,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public Cart addToCart(Long cartId, Long productId, int quantity) {
+    public Cart addToCart(Long cartId, Long productId, int quantity, PizzaSize pizzaSize, CrustType crustType, BeverageSize beverageSize) {
         Optional<Cart> cartOpt = cartRepository.findById(cartId);
         if (!cartOpt.isPresent()) {
             throw new IllegalArgumentException("Cart not found");
@@ -93,6 +90,17 @@ public class CartService {
         Optional<Products> productOpt = productsRepository.findById(productId);
         if (productOpt.isPresent()) {
             Products product = productOpt.get();
+
+            if (product.getCategory() == Category.PIZZA) {
+                if (pizzaSize == null || crustType == null) {
+                    throw new IllegalArgumentException("Pizza requires size and crust type to be specified");
+                }
+            } else if (product.getCategory() == Category.BEVERAGE) {
+                if (beverageSize == null) {
+                    throw new IllegalArgumentException("Beverage requires size to be specified");
+                }
+            }
+
             boolean productExists = false;
 
             for (CartItem item : cart.getCartItems()) {
