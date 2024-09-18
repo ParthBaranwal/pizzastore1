@@ -63,8 +63,8 @@ public class CartService {
 
         return cartDTO;
     }
-    public Cart createCartForUser(Long userId) {
 
+    public Cart createCartForUser(Long userId) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (!userOpt.isPresent()) {
             throw new IllegalArgumentException("User not found with ID: " + userId);
@@ -72,10 +72,8 @@ public class CartService {
 
         User user = userOpt.get();
 
-
         Cart cart = new Cart();
         cart.setUser(user);
-
 
         return cartRepository.save(cart);
     }
@@ -101,20 +99,25 @@ public class CartService {
                 }
             }
 
-            boolean productExists = false;
+            boolean itemExists = false;
 
             for (CartItem item : cart.getCartItems()) {
-                if (item.getProduct().getId().equals(productId)) {
+                if (item.getProduct().getId().equals(productId) &&
+                        (product.getCategory() == Category.PIZZA && item.getPizzaSize() == pizzaSize && item.getCrustType() == crustType ||
+                                product.getCategory() == Category.BEVERAGE && item.getBeverageSize() == beverageSize)) {
                     item.setQuantity(item.getQuantity() + quantity);
                     item.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-                    productExists = true;
+                    itemExists = true;
                     break;
                 }
             }
 
-            if (!productExists) {
+            if (!itemExists) {
                 CartItem newItem = new CartItem(product, quantity);
                 newItem.setCart(cart);
+                newItem.setPizzaSize(pizzaSize);
+                newItem.setCrustType(crustType);
+                newItem.setBeverageSize(beverageSize);
                 cart.getCartItems().add(newItem);
             }
 
