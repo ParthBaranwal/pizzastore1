@@ -17,14 +17,14 @@ public class Cart {
 
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    // Unidirectional One-to-One relationship with User
+
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false, unique = true)
     private User user;
 
     public Cart() {}
 
-    // Getters and Setters
+
 
     public Long getId() {
         return id;

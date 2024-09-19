@@ -26,7 +26,7 @@ public class PaymentController {
 
     @PostMapping("/payments")
     public PaymentResponse processPayment(@RequestBody PaymentRequest paymentRequest) {
-        Orders order = orderService.findById(paymentRequest.getOrderId());
+        Orders order = orderService.getOrderById(paymentRequest.getOrderId());
         if (order == null) {
             throw new IllegalArgumentException("Order not found");
         }
